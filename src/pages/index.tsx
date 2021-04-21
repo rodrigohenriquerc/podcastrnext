@@ -17,11 +17,12 @@ type Episode = {
 };
 
 type HomeProps = {
-  episodes: Episode[];
+  latestEpisodes: Episode[];
+  allEpisodes: Episode[];
 };
 
-export default function Home(props: HomeProps) {
-  return <>{JSON.stringify(props.episodes)}</>;
+export default function Home({ latestEpisodes, allEpisodes }: HomeProps) {
+  return <>{JSON.stringify(latestEpisodes)}</>;
 }
 
 export const getStaticProps: GetStaticProps = async () => {
@@ -47,9 +48,13 @@ export const getStaticProps: GetStaticProps = async () => {
     url: episode.file.url,
   }));
 
+  const latestEpisodes = episodes.slice(0, 2);
+  const allEpisodes = episodes.slice(2, episodes.length);
+
   return {
     props: {
-      episodes,
+      latestEpisodes,
+      allEpisodes,
     },
     revalidate: 60 * 60 * 8,
   };
