@@ -5,6 +5,7 @@ type Episode = {
   id: string;
   title: string;
   members: string;
+  published_at: string;
 };
 
 type HomeProps = {
