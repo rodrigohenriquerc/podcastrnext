@@ -1,14 +1,33 @@
 import Image from "next/image";
-import { useContext } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { PlayerContext } from "../../contexts/PlayerContext";
 import styles from "./styles.module.scss";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 
 export function Player() {
-  const { episodesList, currentEpisodeIndex } = useContext(PlayerContext);
+  const {
+    episodesList,
+    currentEpisodeIndex,
+    isPlaying,
+    togglePlay,
+  } = useContext(PlayerContext);
 
   const episode = episodesList[currentEpisodeIndex];
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const play = useCallback(() => {
+    audioRef?.current?.play();
+  }, [audioRef]);
+
+  const pause = useCallback(() => {
+    audioRef?.current?.pause();
+  }, [audioRef]);
+
+  useEffect(() => {
+    isPlaying ? play() : pause();
+  }, [isPlaying]);
 
   return (
     <div className={styles.playerContainer}>
@@ -50,6 +69,15 @@ export function Player() {
           </div>
           <span>00:00</span>
         </div>
+        {episode && (
+          <audio
+            src={episode.url}
+            autoPlay
+            onPause={() => togglePlay(episode, { isPlaying: false })}
+            onPlay={() => togglePlay(episode, { isPlaying: true })}
+            ref={audioRef}
+          ></audio>
+        )}
         <div className={styles.buttons}>
           <button type="button" disabled={!episode}>
             <img src="/shuffle.svg" alt="Embaralhar" />
@@ -61,8 +89,13 @@ export function Player() {
             type="button"
             className={styles.playButton}
             disabled={!episode}
+            onClick={() => togglePlay(episode)}
           >
-            <img src="/play.svg" alt="Tocar" />
+            {isPlaying ? (
+              <img src="/pause.svg" alt="Pausar" />
+            ) : (
+              <img src="/play.svg" alt="Tocar" />
+            )}
           </button>
           <button type="button" disabled={!episode}>
             <img src="/play-next.svg" alt="Tocar próxima" />
